@@ -13,5 +13,6 @@ public class Product {
     private String code;
     private String name;
     private BigDecimal price;
+    private BigDecimal initPrice;
     private String avialability;
 }
