@@ -28,10 +28,10 @@ public class ProductPageParser extends Thread {
             Element productInfo = document.getElementsByAttributeValue("data-qaid", "main_product_info").first();
 
             String code = getCode(productInfo);
-            String name;
+            String name = getProductName(productInfo);
             BigDecimal price;
             BigDecimal initPrice;
-            String avialability;
+            String avialability = getAvialability(productInfo);
             String url;
 
 
@@ -40,8 +40,24 @@ public class ProductPageParser extends Thread {
         }
     }
 
-    private String getCode(Element element) {
-        Elements codeElements = element.getElementsByAttributeValue("data-qaid", "product-sku");
+    private String getAvialability(Element productInfo) {
+        Elements codeElements = productInfo.getElementsByAttributeValue("data-qaid", "product_presence");
+        if (codeElements.isEmpty()) {
+            return "";
+        }
+        return codeElements.first().text();
+    }
+
+    private String getProductName(Element productInfo) {
+        Elements codeElements = productInfo.getElementsByAttributeValue("data-qaid", "product_name");
+        if (codeElements.isEmpty()) {
+            return "";
+        }
+        return codeElements.first().text();
+    }
+
+    private String getCode(Element productInfo) {
+        Elements codeElements = productInfo.getElementsByAttributeValue("data-qaid", "product-sku");
         if (codeElements.isEmpty()) {
             return "";
         }
