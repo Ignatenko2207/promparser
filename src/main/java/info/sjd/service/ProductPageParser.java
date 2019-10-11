@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class ProductPageParser extends Thread {
@@ -29,15 +30,44 @@ public class ProductPageParser extends Thread {
 
             String code = getCode(productInfo);
             String name = getProductName(productInfo);
-            BigDecimal price;
-            BigDecimal initPrice;
+            BigDecimal price = getPrice(productInfo);
+            BigDecimal initPrice = getInitPrice(productInfo, price);
             String avialability = getAvialability(productInfo);
-            String url;
+            String url = this.url;
 
+            Product product = new Product(code, name, price, initPrice, avialability, url);
+
+            products.add(product);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private BigDecimal getInitPrice(Element productInfo, BigDecimal currentPrice) {
+        Elements priceElements = productInfo.getElementsByAttributeValue("data-qaid", "price_without_discount");
+        if (!priceElements.isEmpty()) {
+            Element priceElement = priceElements.first();
+            String priceAsText = priceElement.attr("data-qaprice");
+            if (priceAsText != null && !(priceAsText.replaceAll("\\D", "").isEmpty())) {
+                double price = Double.valueOf(priceAsText);
+                return new BigDecimal(price).setScale(2, RoundingMode.HALF_UP);
+            }
+        }
+        return currentPrice;
+    }
+
+    private BigDecimal getPrice(Element productInfo) {
+        Elements priceElements = productInfo.getElementsByAttributeValue("data-qaid", "product_price");
+        if (!priceElements.isEmpty()) {
+            Element priceElement = priceElements.first();
+            String priceAsText = priceElement.attr("data-qaprice");
+            if (priceAsText != null && !(priceAsText.replaceAll("\\D", "").isEmpty())) {
+               double price = Double.valueOf(priceAsText);
+               return new BigDecimal(price).setScale(2, RoundingMode.HALF_UP);
+            }
+        }
+        return BigDecimal.ZERO;
     }
 
     private String getAvialability(Element productInfo) {
