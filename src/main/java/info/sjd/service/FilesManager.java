@@ -15,7 +15,7 @@ public class FilesManager {
     public static void write(Product product) {
         checkDirectory();
 
-        try (FileWriter fileWriter = new FileWriter(FILE_PATH)){
+        try (FileWriter fileWriter = new FileWriter(FILE_PATH, true)){
             fileWriter.write(product.toString() + "\n");
             fileWriter.flush();
         } catch (IOException e) {
